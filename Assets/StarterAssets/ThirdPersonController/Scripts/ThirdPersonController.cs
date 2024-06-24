@@ -1,5 +1,8 @@
-﻿ using UnityEngine;
-#if ENABLE_INPUT_SYSTEM 
+﻿using System;
+using UnityEngine;
+using UnityEngine.AI;
+
+#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 
@@ -107,7 +110,6 @@ namespace StarterAssets
         private GameObject _mainCamera;
 
         private const float _threshold = 0.01f;
-
         private bool _hasAnimator;
 
         private bool IsCurrentDeviceMouse
@@ -122,6 +124,12 @@ namespace StarterAssets
             }
         }
 
+        private bool _moveToTarget = false;
+        private Transform _targetTransform;
+        private Action _onTargetReached;
+        private NavMeshAgent agent;
+        [SerializeField] private float targetRotationLerpSpeed = 2f;
+        [SerializeField] private float targetRotationThreshold = 5.0f;
 
         private void Awake()
         {
@@ -130,6 +138,7 @@ namespace StarterAssets
             {
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
+          
         }
 
         private void Start()
@@ -137,6 +146,7 @@ namespace StarterAssets
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             
             _hasAnimator = TryGetComponent(out _animator);
+             agent = GetComponent<NavMeshAgent>();
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
 #if ENABLE_INPUT_SYSTEM 
@@ -156,10 +166,48 @@ namespace StarterAssets
         {
             _hasAnimator = TryGetComponent(out _animator);
 
-            JumpAndGravity();
-            GroundedCheck();
-            Move();
+            if (_moveToTarget) {
+                MoveToTarget();
+            }
+            else {
+                JumpAndGravity();
+                GroundedCheck();
+                Move();
+            }
         }
+
+        public void SetTargetPosition(Transform targetTransform, Action onTargetReached) {
+            _targetTransform = targetTransform;
+            _onTargetReached = onTargetReached;
+            _moveToTarget = true;
+        }
+
+        private void MoveToTarget() {
+            if (!agent.enabled) {
+                agent.enabled = true;
+            }
+
+            agent.SetDestination(_targetTransform.position);
+
+            // Calculate direction to the target
+            Vector3 direction = (_targetTransform.position - transform.position).normalized;
+            direction.y = 0; // Ensure the rotation is only in the horizontal plane
+
+            // Calculate the target rotation
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+            // Smoothly rotate towards the target
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * targetRotationLerpSpeed);
+
+            if (agent.remainingDistance < 0.1f) {
+                if (Quaternion.Angle(transform.rotation, targetRotation) < targetRotationThreshold) {
+                    _moveToTarget = false;
+                    _onTargetReached?.Invoke();
+                    agent.enabled = false;
+                }
+            }
+        }
+
 
         private void LateUpdate()
         {
@@ -375,7 +423,7 @@ namespace StarterAssets
             {
                 if (FootstepAudioClips.Length > 0)
                 {
-                    var index = Random.Range(0, FootstepAudioClips.Length);
+                    var index = UnityEngine.Random.Range(0, FootstepAudioClips.Length);
                     AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
                 }
             }
