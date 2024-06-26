@@ -2,14 +2,43 @@ using UnityEngine;
 
 public class Item : MonoBehaviour, IHoldable {
 
-    [SerializeField] private Transform leftHandTargetIk;
-    [SerializeField] private Transform rightHandTargetIk;
-    [SerializeField] private Transform targetStandPosition;
+    private ColliderEdgeDetector edgeDetector;
+    private Rigidbody rb;
+    [SerializeField] private float throwForce = 2f;
 
-    public Transform GetLeftHandIkTarget() => leftHandTargetIk;
+    private void Awake() {
+        edgeDetector = GetComponent<ColliderEdgeDetector>();
+        rb = GetComponent<Rigidbody>();
+    }
 
-    public Transform GetRightHandIkTarget() => rightHandTargetIk;
+    public Vector3 GetLeftHandIkTargetPosition() => edgeDetector.GetLeftHoldPoint();
+
+    public Vector3 GetRightHandIkTargetPosition() => edgeDetector.GetRightHoldPoint();
 
     public Transform GetTransform() => transform;
-    public Transform GetStandTargetTransform() => targetStandPosition;
+
+    public void SetKinematic(bool active) => rb.isKinematic = active;
+
+    public void SetParent(Transform target,bool resetLocalPos = true) {
+        if(target != null) {
+            transform.SetParent(target);
+            if(resetLocalPos ) {
+                transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            }
+        }
+        else {
+            transform.SetParent(null);
+        }
+      
+    }
+
+    public void Throw(Transform objectHoldTransform) {
+        SetKinematic(false);
+        SetParent(null);
+        GetComponent<Collider>().isTrigger = false;
+        Vector3 dir = objectHoldTransform.position - transform.position;
+        rb.AddForce(dir * throwForce,ForceMode.Impulse);
+    }
+
+    public Collider GetCollider() => GetComponent<Collider>();
 }

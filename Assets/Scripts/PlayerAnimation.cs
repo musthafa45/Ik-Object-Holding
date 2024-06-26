@@ -5,28 +5,37 @@ using UnityEngine;
 public class PlayerAnimation : MonoBehaviour
 {
     private Animator animator;
-    private int hold_Hash;
+    private int leanDown_Hash;
+    private int leanUp_Hash;
     private ThirdPersonController controller;
 
     private void Awake() {
         animator = GetComponent<Animator>();
-        hold_Hash = Animator.StringToHash("Hold");
+        leanDown_Hash = Animator.StringToHash("LeanDown");
+        leanUp_Hash = Animator.StringToHash("LeanUp");
         controller = GetComponent<ThirdPersonController>();
     }
 
     void Start()
     {
         Interactor.Instance.OnHoldableInteracted += Interactor_Instance_OnHoldableInteracted;
+        GetComponent<PlayerIK>().OnObjectParentChanged += PlayerAnimation_OnObjectParentChanged;
+    }
+
+    private void PlayerAnimation_OnObjectParentChanged(IHoldable holdable) {
+        animator.SetTrigger(leanUp_Hash);
     }
 
     private void Interactor_Instance_OnHoldableInteracted(IHoldable holdable) {
 
         Debug.Log(holdable.GetTransform().name);
 
-        Transform standTargetTransform = holdable.GetStandTargetTransform();
+        if (PlayerIK.Instance.HasHoldingObject()) return;
+
+        Transform standTargetTransform = holdable.GetTransform();
 
         SetTargetToMove(standTargetTransform, () => {
-            animator.SetTrigger(hold_Hash);
+            animator.SetTrigger(leanDown_Hash);
         });
 
     }

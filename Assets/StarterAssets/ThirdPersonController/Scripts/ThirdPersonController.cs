@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.AI;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -108,6 +107,7 @@ namespace StarterAssets
         private CharacterController _controller;
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
+        private PlayerIK playerIK;
 
         private const float _threshold = 0.01f;
         private bool _hasAnimator;
@@ -127,9 +127,9 @@ namespace StarterAssets
         private bool _moveToTarget = false;
         private Transform _targetTransform;
         private Action _onTargetReached;
-        private NavMeshAgent agent;
+
         [SerializeField] private float targetRotationLerpSpeed = 2f;
-        [SerializeField] private float targetRotationThreshold = 5.0f;
+        [SerializeField] private float agentStoppingDistance = 0.4f;
 
         private void Awake()
         {
@@ -146,9 +146,9 @@ namespace StarterAssets
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             
             _hasAnimator = TryGetComponent(out _animator);
-             agent = GetComponent<NavMeshAgent>();
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
+            playerIK = GetComponent<PlayerIK>();
 #if ENABLE_INPUT_SYSTEM 
             _playerInput = GetComponent<PlayerInput>();
 #else
@@ -183,15 +183,8 @@ namespace StarterAssets
         }
 
         private void MoveToTarget() {
-            if (!agent.enabled) {
-                agent.enabled = true;
-            }
-
-            agent.SetDestination(_targetTransform.position);
-
-            // Calculate direction to the target
             Vector3 direction = (_targetTransform.position - transform.position).normalized;
-            direction.y = 0; // Ensure the rotation is only in the horizontal plane
+            direction.y = 0; // Ensure the movement is only in the horizontal plane
 
             // Calculate the target rotation
             Quaternion targetRotation = Quaternion.LookRotation(direction);
@@ -199,15 +192,17 @@ namespace StarterAssets
             // Smoothly rotate towards the target
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * targetRotationLerpSpeed);
 
-            if (agent.remainingDistance < 0.1f) {
-                if (Quaternion.Angle(transform.rotation, targetRotation) < targetRotationThreshold) {
-                    _moveToTarget = false;
-                    _onTargetReached?.Invoke();
-                    agent.enabled = false;
-                }
+            // Move towards the target
+            Vector3 move = direction * MoveSpeed * Time.deltaTime;
+            _controller.Move(move);
+
+            _animator.SetFloat(_animIDSpeed, MoveSpeed);
+
+            if (Vector3.Distance(transform.position, _targetTransform.position) < agentStoppingDistance) {
+                _moveToTarget = false;
+                _onTargetReached?.Invoke();
             }
         }
-
 
         private void LateUpdate()
         {
@@ -262,7 +257,7 @@ namespace StarterAssets
         private void Move()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
-            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            float targetSpeed = _input.sprint && !playerIK.HasHoldingObject() ? SprintSpeed : MoveSpeed;
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
@@ -331,6 +326,7 @@ namespace StarterAssets
         {
             if (Grounded)
             {
+
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
 
@@ -348,7 +344,7 @@ namespace StarterAssets
                 }
 
                 // Jump
-                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                if (_input.jump && _jumpTimeoutDelta <= 0.0f && !playerIK.HasHoldingObject())
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);

@@ -1,26 +1,43 @@
 using UnityEngine;
 
 public class ColliderEdgeDetector : MonoBehaviour {
+
     public Color gizmoColor = Color.red;
     public Color rayCastColor = Color.red;
-    public bool showRayCast = true;
-    public Transform playerTransform; // Reference to the player
-    public float rayLength = 2f; // Length of the raycasts
-    public LayerMask layerMask; // LayerMask to filter which layers to consider
-    private Vector3 leftGripPoint;
-    private Vector3 rightGripPoint;
 
+    public bool showRayCast = true;
+
+    public Transform playerTransform; // Reference to the player
+
+    public float rayLength = 2f; // Length of the raycasts
+    public LayerMask layerMask;  // LayerMask to filter which layers to consider
+    public Vector3 rayOffset = Vector3.zero; //offset of Ray Orgin
+    [Space]
+    private Vector3 leftHoldPoint;
+    private Vector3 rightHoldPoint;
+    [Space]
+
+    [SerializeField] private Vector3 leftHoldPointOffset;
+    [SerializeField] private Vector3 rightHoldPointOffset;
+
+    private Collider baseCollider;
+    private void Awake() {
+        baseCollider = GetComponent<Collider>();
+    }
     private void OnDrawGizmos() {
-        Collider collider = GetComponent<Collider>();
-        if (collider != null && playerTransform != null) {
-            CalculateGripPoints(collider);
-            Gizmos.color = gizmoColor;
-            Gizmos.DrawSphere(leftGripPoint, 0.07f);
-            Gizmos.DrawSphere(rightGripPoint, 0.07f);
+        Gizmos.color = gizmoColor;
+        Gizmos.DrawSphere(leftHoldPoint, 0.07f);
+        Gizmos.DrawSphere(rightHoldPoint, 0.07f);
+    }
+
+    private void FixedUpdate() {
+
+        if (baseCollider != null && playerTransform != null) {
+            CalculateHoldPoints(baseCollider);
         }
     }
 
-    private void CalculateGripPoints(Collider collider) {
+    private void CalculateHoldPoints(Collider collider) {
         Vector3 objectCenter = collider.bounds.center;
         Vector3 directionToPlayer = (playerTransform.position - objectCenter).normalized;
 
@@ -29,34 +46,39 @@ public class ColliderEdgeDetector : MonoBehaviour {
         Vector3 leftDirection = -rightDirection;
 
         // Cast rays from outside the object towards its center
-        RaycastHit hit;
 
         // Right grip point
-        if (Physics.Raycast(objectCenter + rightDirection * rayLength, -rightDirection, out hit, rayLength, layerMask)) {
+        if (Physics.Raycast(objectCenter + rightDirection + rayOffset * rayLength, -rightDirection, out RaycastHit hit, rayLength, layerMask)) {
             if (hit.collider == collider) {
-                rightGripPoint = hit.point;
-                if (showRayCast) Debug.DrawRay(objectCenter + rightDirection * rayLength, -rightDirection * rayLength, rayCastColor);
+                leftHoldPoint = hit.point + leftHoldPointOffset;
+
+                if (showRayCast) Debug.DrawRay(objectCenter + rightDirection + rayOffset * rayLength, -rightDirection * rayLength, rayCastColor);
             }
             else {
-                rightGripPoint = objectCenter + rightDirection * rayLength;
+                leftHoldPoint = objectCenter + rightDirection + leftHoldPointOffset * rayLength;
             }
         }
         else {
-            rightGripPoint = objectCenter + rightDirection * rayLength;
+            leftHoldPoint = objectCenter + rightDirection + leftHoldPointOffset * rayLength;
         }
 
         // Left grip point
-        if (Physics.Raycast(objectCenter + leftDirection * rayLength, -leftDirection, out hit, rayLength, layerMask)) {
+        if (Physics.Raycast(objectCenter + leftDirection + rayOffset * rayLength, -leftDirection, out hit, rayLength, layerMask)) {
             if (hit.collider == collider) {
-                leftGripPoint = hit.point;
-                if (showRayCast) Debug.DrawRay(objectCenter + leftDirection * rayLength, -leftDirection * rayLength, rayCastColor);
+                rightHoldPoint = hit.point + rightHoldPointOffset;
+
+                if (showRayCast) Debug.DrawRay(objectCenter + leftDirection + rayOffset * rayLength, -leftDirection * rayLength, rayCastColor);
             }
             else {
-                leftGripPoint = objectCenter + leftDirection * rayLength;
+                rightHoldPoint = objectCenter + leftDirection + rightHoldPointOffset * rayLength;
             }
         }
         else {
-            leftGripPoint = objectCenter + leftDirection * rayLength;
+            rightHoldPoint = objectCenter + leftDirection + rightHoldPointOffset * rayLength;
         }
     }
+
+    public Vector3 GetLeftHoldPoint() => leftHoldPoint;
+
+    public Vector3 GetRightHoldPoint() => rightHoldPoint;
 }
