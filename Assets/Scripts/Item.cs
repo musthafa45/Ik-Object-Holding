@@ -40,5 +40,19 @@ public class Item : MonoBehaviour, IHoldable {
         rb.AddForce(dir * throwForce,ForceMode.Impulse);
     }
 
-    public Collider GetCollider() => GetComponent<Collider>();
+    public Collider GetCollider() {
+        if(TryGetComponent<Collider>(out Collider collider)) {
+            return collider;
+        }
+        else {
+            collider = GetComponentInParent<Collider>();
+            if(collider != null) {
+                return collider;
+            }
+            else {
+                Debug.Log("Object Has not Any Attached Collider");
+                return null;
+            }
+        }
+    } 
 }

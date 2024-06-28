@@ -22,7 +22,7 @@ public class ColliderEdgeDetector : MonoBehaviour {
 
     private Collider baseCollider;
     private void Awake() {
-        baseCollider = GetComponent<Collider>();
+        baseCollider = GetCollider();
     }
     private void OnDrawGizmos() {
         Gizmos.color = gizmoColor;
@@ -81,4 +81,20 @@ public class ColliderEdgeDetector : MonoBehaviour {
     public Vector3 GetLeftHoldPoint() => leftHoldPoint;
 
     public Vector3 GetRightHoldPoint() => rightHoldPoint;
+
+    private Collider GetCollider() {
+        if (TryGetComponent(out Collider collider)) {
+            return collider;
+        }
+        else {
+            collider = GetComponentInParent<Collider>();
+            if (collider != null) {
+                return collider;
+            }
+            else {
+                Debug.Log("Object Has not Any Attached Collider");
+                return null;
+            }
+        }
+    }
 }
