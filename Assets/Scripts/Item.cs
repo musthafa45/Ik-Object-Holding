@@ -35,13 +35,13 @@ public class Item : MonoBehaviour, IHoldable {
     public void Throw(Transform objectHoldTransform) {
         SetKinematic(false);
         SetParent(null);
-        GetComponent<Collider>().isTrigger = false;
+        GetCollider().isTrigger = false;
         Vector3 dir = objectHoldTransform.position - transform.position;
         rb.AddForce(dir * throwForce,ForceMode.Impulse);
     }
 
     public Collider GetCollider() {
-        if(TryGetComponent<Collider>(out Collider collider)) {
+        if(TryGetComponent(out Collider collider)) {
             return collider;
         }
         else {

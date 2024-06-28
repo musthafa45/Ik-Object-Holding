@@ -1,7 +1,6 @@
 using UnityEngine;
 
 public class ColliderEdgeDetector : MonoBehaviour {
-
     public Color gizmoColor = Color.red;
     public Color rayCastColor = Color.red;
 
@@ -11,27 +10,52 @@ public class ColliderEdgeDetector : MonoBehaviour {
 
     public float rayLength = 2f; // Length of the raycasts
     public LayerMask layerMask;  // LayerMask to filter which layers to consider
-    public Vector3 rayOffset = Vector3.zero; //offset of Ray Orgin
+    public Vector3 rayOffset = Vector3.zero; // Offset of Ray Origin
     [Space]
-    private Vector3 leftHoldPoint;
-    private Vector3 rightHoldPoint;
+    private Transform leftHoldPointTransform;
+    private Transform rightHoldPointTransform;
     [Space]
 
     [SerializeField] private Vector3 leftHoldPointOffset;
     [SerializeField] private Vector3 rightHoldPointOffset;
 
     private Collider baseCollider;
+    private bool canDoFixedHoldPoint = false;
     private void Awake() {
         baseCollider = GetCollider();
+
+        leftHoldPointTransform = new GameObject("left_Point").transform;
+        rightHoldPointTransform = new GameObject("right_point").transform;
+        leftHoldPointTransform.parent = transform;
+        rightHoldPointTransform.parent = transform;
     }
+
+    private void Start() {
+        PlayerIK.Instance.OnObjectParentChanged += PlayerIk_Instance_OnObjectParentChanged;
+        PlayerIK.Instance.OnPlayerStabled += PlayerIk_Instance_OnPlayerStabled;
+    }
+
+    private void PlayerIk_Instance_OnObjectParentChanged(IHoldable holdable) {
+        if(holdable == null) {
+            canDoFixedHoldPoint = false;
+        }
+    }
+
+    private void PlayerIk_Instance_OnPlayerStabled(IHoldable holdable) {
+        if (holdable != null && holdable == GetComponent<IHoldable>()) {
+            canDoFixedHoldPoint = true;
+        }
+    }
+
     private void OnDrawGizmos() {
+        if (leftHoldPointTransform == null || rightHoldPointTransform == null) return;
+
         Gizmos.color = gizmoColor;
-        Gizmos.DrawSphere(leftHoldPoint, 0.07f);
-        Gizmos.DrawSphere(rightHoldPoint, 0.07f);
+        Gizmos.DrawSphere(leftHoldPointTransform.position, 0.07f);
+        Gizmos.DrawSphere(rightHoldPointTransform.position, 0.07f);
     }
 
     private void FixedUpdate() {
-
         if (baseCollider != null && playerTransform != null) {
             CalculateHoldPoints(baseCollider);
         }
@@ -50,37 +74,50 @@ public class ColliderEdgeDetector : MonoBehaviour {
         // Right grip point
         if (Physics.Raycast(objectCenter + rightDirection + rayOffset * rayLength, -rightDirection, out RaycastHit hit, rayLength, layerMask)) {
             if (hit.collider == collider) {
-                leftHoldPoint = hit.point + leftHoldPointOffset;
 
-                if (showRayCast) Debug.DrawRay(objectCenter + rightDirection + rayOffset * rayLength, -rightDirection * rayLength, rayCastColor);
+                if (!canDoFixedHoldPoint)
+                    leftHoldPointTransform.position = hit.point + leftHoldPointOffset;
+
+
+                if (showRayCast)
+                    Debug.DrawRay(objectCenter + rightDirection + rayOffset * rayLength, -rightDirection * rayLength, rayCastColor);
             }
             else {
-                leftHoldPoint = objectCenter + rightDirection + leftHoldPointOffset * rayLength;
+                if (!canDoFixedHoldPoint)
+                    leftHoldPointTransform.position = objectCenter + rightDirection + leftHoldPointOffset * rayLength;
+
+
             }
         }
         else {
-            leftHoldPoint = objectCenter + rightDirection + leftHoldPointOffset * rayLength;
+            if (!canDoFixedHoldPoint)
+                leftHoldPointTransform.position = objectCenter + rightDirection + leftHoldPointOffset * rayLength;
         }
 
         // Left grip point
         if (Physics.Raycast(objectCenter + leftDirection + rayOffset * rayLength, -leftDirection, out hit, rayLength, layerMask)) {
             if (hit.collider == collider) {
-                rightHoldPoint = hit.point + rightHoldPointOffset;
 
-                if (showRayCast) Debug.DrawRay(objectCenter + leftDirection + rayOffset * rayLength, -leftDirection * rayLength, rayCastColor);
+                if (!canDoFixedHoldPoint)
+                    rightHoldPointTransform.position = hit.point + rightHoldPointOffset;
+
+                if (showRayCast)
+                    Debug.DrawRay(objectCenter + leftDirection + rayOffset * rayLength, -leftDirection * rayLength, rayCastColor);
             }
             else {
-                rightHoldPoint = objectCenter + leftDirection + rightHoldPointOffset * rayLength;
+                if (!canDoFixedHoldPoint)
+                    rightHoldPointTransform.position = objectCenter + leftDirection + rightHoldPointOffset * rayLength;
             }
         }
         else {
-            rightHoldPoint = objectCenter + leftDirection + rightHoldPointOffset * rayLength;
+            if (!canDoFixedHoldPoint)
+                rightHoldPointTransform.position = objectCenter + leftDirection + rightHoldPointOffset * rayLength;
         }
     }
 
-    public Vector3 GetLeftHoldPoint() => leftHoldPoint;
+    public Vector3 GetLeftHoldPoint() => leftHoldPointTransform.position;
 
-    public Vector3 GetRightHoldPoint() => rightHoldPoint;
+    public Vector3 GetRightHoldPoint() => rightHoldPointTransform.position;
 
     private Collider GetCollider() {
         if (TryGetComponent(out Collider collider)) {
@@ -97,4 +134,22 @@ public class ColliderEdgeDetector : MonoBehaviour {
             }
         }
     }
+
+    private void OnGUI() {
+        if(leftHoldPointTransform == null || rightHoldPointTransform == null) return;
+
+        // Create a style for the label
+        GUIStyle style = new GUIStyle();
+        style.fontSize = 10;
+        style.normal.textColor = Color.green;
+
+        // Convert world positions to screen positions
+        Vector3 leftScreenPoint = Camera.main.WorldToScreenPoint(leftHoldPointTransform.position);
+        Vector3 rightScreenPoint = Camera.main.WorldToScreenPoint(rightHoldPointTransform.position);
+
+        // Draw labels at screen positions
+        GUI.Label(new Rect(leftScreenPoint.x, Screen.height - leftScreenPoint.y, 100, 20), "Left", style);
+        GUI.Label(new Rect(rightScreenPoint.x, Screen.height - rightScreenPoint.y, 100, 20), "Right", style);
+    }
+
 }

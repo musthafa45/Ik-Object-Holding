@@ -6,6 +6,7 @@ public class PlayerIK : MonoBehaviour {
     public static PlayerIK Instance {  get; private set; } 
 
     public event Action<IHoldable> OnObjectParentChanged;
+    public event Action<IHoldable> OnPlayerStabled;
 
     [SerializeField] private Rig holdingIkRig;
 
@@ -26,6 +27,7 @@ public class PlayerIK : MonoBehaviour {
     private Collider holdableColliderType;
 
     private bool canPullHoldable = false;
+    private bool isStableEventInvoked = false;
 
     [SerializeField] private float lerpSpeed = 5f; // Speed of the lerp transition
 
@@ -74,7 +76,13 @@ public class PlayerIK : MonoBehaviour {
             Transform childTransform = objectHoldTransform.GetChild(0);
             childTransform.localPosition = Vector3.Lerp(childTransform.localPosition, Vector3.zero, Time.deltaTime * lerpSpeed / 2);
 
-            if(holdableColliderType is CapsuleCollider) {
+            if(childTransform.localPosition ==  Vector3.zero && !isStableEventInvoked) {
+                Debug.Log("raise event Here OnPlayer get Stabled");
+                OnPlayerStabled?.Invoke(holdable);
+                isStableEventInvoked = true;
+            }
+
+            if(holdableColliderType is CapsuleCollider /* || holdableColliderType is MeshCollider*/) {
                 childTransform.localRotation = Quaternion.Lerp(childTransform.localRotation, Quaternion.identity, Time.deltaTime * lerpSpeed / 2);
             }
         }
@@ -83,11 +91,13 @@ public class PlayerIK : MonoBehaviour {
     private void ThrowObject() {
         holdable?.Throw(objectHoldTransform);
         SetHoldableNull();
+        isStableEventInvoked = false;
     }
 
     private void SetHoldableNull() {
         holdable = null;
         holdableColliderType = null;
+        OnObjectParentChanged?.Invoke(null);
     }
 
     public void EnableHandIk() {
