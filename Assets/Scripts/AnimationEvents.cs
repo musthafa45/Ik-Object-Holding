@@ -22,6 +22,5 @@ public class AnimationEvents : MonoBehaviour {
     public enum EventType {
         LeanOnMiddle,
         LeanOnFloor,
-        LeanUpStand
     }
 }

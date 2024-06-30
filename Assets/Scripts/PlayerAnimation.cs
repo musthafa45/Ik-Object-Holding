@@ -10,7 +10,7 @@ public class PlayerAnimation : MonoBehaviour
 
     private void Awake() {
         animator = GetComponent<Animator>();
-        pickUp_Hash = Animator.StringToHash("LeanDown");
+        pickUp_Hash = Animator.StringToHash("PickUp");
         controller = GetComponent<ThirdPersonController>();
     }
 

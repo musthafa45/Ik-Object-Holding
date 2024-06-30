@@ -42,12 +42,6 @@ public class ColliderEdgeDetector : MonoBehaviour {
         }
     }
 
-    private void PlayerIk_Instance_OnPlayerStabled(IHoldable holdable) {
-        if (holdable != null && holdable == GetComponent<IHoldable>()) {
-            canDoFixedHoldPoint = true;
-        }
-    }
-
     private void OnDrawGizmos() {
         if (leftHoldPointTransform == null || rightHoldPointTransform == null) return;
 

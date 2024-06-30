@@ -91,14 +91,14 @@ public class PlayerIK : MonoBehaviour {
         }
     }
 
-    public void OnLeanMiddle() { //Animation Event
-        ToggleWeight();
-    }
 
     private void ToggleWeight() {
         isHolding = !isHolding;
 
         targetWeight = isHolding ? 1 : 0;
+    }
+    public void OnLeanMiddle() { //Animation Event
+        ToggleWeight();
     }
 
     public void OnLeanFloor() { //Animation Event
@@ -131,12 +131,6 @@ public class PlayerIK : MonoBehaviour {
         }
 
     }
-
-    public void OnLeanStand() { //Animation Event
-
-    }
-
-
 
     private void SetActiveIks(List<Rig> rigs, bool active) {
         foreach (Rig rig in rigs)
