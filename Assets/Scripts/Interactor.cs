@@ -29,7 +29,7 @@ public class Interactor : MonoBehaviour {
         if(numColliders > 0 ) {
 
             if (colliders[0].gameObject.TryGetComponent(out IHoldable holdable)) {
-                OnHoldableInteracted(holdable);
+                OnHoldableInteracted?.Invoke(holdable);
             }
         }
     }
