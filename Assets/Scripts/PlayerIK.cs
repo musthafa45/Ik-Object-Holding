@@ -7,9 +7,6 @@ using UnityEngine.Animations.Rigging;
 public class PlayerIK : MonoBehaviour {
     public static PlayerIK Instance { get; private set; }
 
-    public event Action<IHoldable> OntemPicked;
-    public event Action<IHoldable> OnPlayerPlaceDownKeyPerformed;
-
     [SerializeField] private Rig handPositionRotationRig;
     [SerializeField] private Rig rightLegPositionRig;
     [SerializeField] private Rig headAimRig;
@@ -30,7 +27,6 @@ public class PlayerIK : MonoBehaviour {
 
     private bool isHolding = false;
     private bool canPullHoldable = false;
-    private bool isPickedItemStabled = false;
 
     [SerializeField] private float lerpSpeed = 5f; // Speed of the lerp transition
 
@@ -58,7 +54,8 @@ public class PlayerIK : MonoBehaviour {
         headAimRig.weight = Mathf.Lerp(headAimRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
 
         // Update Leg IK weights smoothly
-        rightLegPositionRig.weight = Mathf.Lerp(rightLegPositionRig.weight, 0, Time.deltaTime * lerpSpeed / 2);
+        rightLegPositionRig.weight = Mathf.Lerp(rightLegPositionRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
+
 
         // Update IK targets positions if holdable is not null
         if (holdable != null && targetWeight > 0f) {
@@ -75,11 +72,6 @@ public class PlayerIK : MonoBehaviour {
         if (canPullHoldable && holdable != null && objectHoldTransform.childCount > 0) {
             Transform childTransform = objectHoldTransform.GetChild(0);
             childTransform.localPosition = Vector3.Lerp(childTransform.localPosition, Vector3.zero, Time.deltaTime * lerpSpeed / 2);
-
-            if (childTransform.localPosition == Vector3.zero) {
-                //Debug.Log("Item Stabled");
-                isPickedItemStabled = true;
-            }
 
             if (holdable.GetCollider() is CapsuleCollider /* || holdableColliderType is MeshCollider */) {
                 childTransform.localRotation = Quaternion.Lerp(childTransform.localRotation, Quaternion.identity, Time.deltaTime * lerpSpeed / 2);
@@ -107,18 +99,23 @@ public class PlayerIK : MonoBehaviour {
 
     public void OnLeanFloor() { //Animation Event
         if (isHolding && holdable != null) {
-            Debug.Log("Picking Up Saved Data Item");
+            Debug.Log("Picking Up  Item");
+
             holdable.SetParent(objectHoldTransform, false);
+
             holdable.GetTransform().GetComponent<Collider>().isTrigger = true;
-            OntemPicked?.Invoke(holdable); // It Invokes Lean Up Anim
+
             canPullHoldable = true;
         }
         else if (!isHolding && holdable != null) {
             Debug.Log("Dropping Down Item");
+
             holdable.SetParent(null, false);
+
             holdable.GetTransform().GetComponent<Collider>().isTrigger = false;
+
             holdable.SetKinematic(false);
-            OntemPicked?.Invoke(null);
+
             holdable = null;
         }
     }
@@ -130,15 +127,10 @@ public class PlayerIK : MonoBehaviour {
 
     public bool HasHoldingObject() => holdable != null;
 
-    public bool IsHoldItemStabled() => HasHoldingObject() && isPickedItemStabled;
-
-    public IHoldable GetHoldItem() => holdable;
-
     public void Throw() {
         if (holdable != null) {
             holdable?.Throw(objectHoldTransform);
             holdable = null;
-            isPickedItemStabled = false;
             ToggleWeight();
         }
     }

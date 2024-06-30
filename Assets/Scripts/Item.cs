@@ -41,18 +41,9 @@ public class Item : MonoBehaviour, IHoldable {
     }
 
     public Collider GetCollider() {
-        if(TryGetComponent(out Collider collider)) {
+        if (TryGetComponent(out Collider collider))
             return collider;
-        }
-        else {
-            collider = GetComponentInParent<Collider>();
-            if(collider != null) {
-                return collider;
-            }
-            else {
-                Debug.Log("Object Has not Any Attached Collider");
-                return null;
-            }
-        }
+        else 
+            return null;
     } 
 }
