@@ -569,6 +569,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   throwForce: 2
+--- !u!1 &383823835
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 383823837}
+  - component: {fileID: 383823836}
+  m_Layer: 0
+  m_Name: Input Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &383823836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383823835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abd50c8695db0d74eb913ccecd6ec549, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &383823837
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383823835}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410448483
 GameObject:
   m_ObjectHideFlags: 0
@@ -2039,6 +2083,53 @@ Transform:
   - {fileID: 1539149022}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1200855809
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1200855811}
+  - component: {fileID: 1200855810}
+  m_Layer: 0
+  m_Name: Rig 3(Head Aim)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1200855810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1200855809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Weight: 1
+  m_Effectors: []
+--- !u!4 &1200855811
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1200855809}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.1284857, y: 0.4533224, z: 8.818908}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1853100437}
+  m_Father: {fileID: 3893294199639930361}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1221041499
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2437,13 +2528,13 @@ Transform:
   m_GameObject: {fileID: 1449271885}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 6.1284857, y: -0.4533224, z: -8.818908}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 410448484}
   - {fileID: 606576842}
-  m_Father: {fileID: 1809411671}
+  m_Father: {fileID: 1573587794}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1449271887
 MonoBehaviour:
@@ -2657,6 +2748,53 @@ MonoBehaviour:
   rayOffset: {x: 0, y: 0, z: 0}
   leftHoldPointOffset: {x: 0, y: 0, z: 0}
   rightHoldPointOffset: {x: 0, y: 0, z: 0}
+--- !u!1 &1573587792
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1573587794}
+  - component: {fileID: 1573587793}
+  m_Layer: 0
+  m_Name: Rig 2(Right Leg)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1573587793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1573587792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Weight: 1
+  m_Effectors: []
+--- !u!4 &1573587794
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1573587792}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.1284857, y: 0.4533224, z: 8.818908}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1449271886}
+  m_Father: {fileID: 3893294199639930361}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1664100943
 GameObject:
   m_ObjectHideFlags: 0
@@ -2887,7 +3025,7 @@ GameObject:
   - component: {fileID: 1809411671}
   - component: {fileID: 1809411670}
   m_Layer: 0
-  m_Name: Rig 1
+  m_Name: Rig 1(Arms)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2954,10 +3092,8 @@ Transform:
   m_Children:
   - {fileID: 30764317}
   - {fileID: 429575584}
-  - {fileID: 1449271886}
   - {fileID: 983013143}
   - {fileID: 959025100}
-  - {fileID: 1853100437}
   m_Father: {fileID: 3893294199639930361}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1823565220 stripped
@@ -2991,12 +3127,12 @@ Transform:
   m_GameObject: {fileID: 1853100436}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 6.1284857, y: -0.4533224, z: -8.818908}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1088786127}
-  m_Father: {fileID: 1809411671}
+  m_Father: {fileID: 1200855811}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1853100438
 MonoBehaviour:
@@ -5334,6 +5470,8 @@ Transform:
   - {fileID: 8002264680806281515}
   - {fileID: 272993188152429408}
   - {fileID: 1809411671}
+  - {fileID: 1573587794}
+  - {fileID: 1200855811}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &3964097222371235843
@@ -7424,7 +7562,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39c20ad2adb0cca42a6d10fced4c62fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  holdingIkRig: {fileID: 1809411670}
+  handPositionRotationRig: {fileID: 1809411670}
+  rightLegPositionRig: {fileID: 1573587793}
+  headAimRig: {fileID: 1200855810}
   leftBoneIKConstraint: {fileID: 30764318}
   rightBoneIKConstraint: {fileID: 429575585}
   leftHandAimConstraint: {fileID: 983013144}
@@ -7447,6 +7587,10 @@ MonoBehaviour:
   m_RigLayers:
   - m_Rig: {fileID: 1809411670}
     m_Active: 1
+  - m_Rig: {fileID: 1573587793}
+    m_Active: 1
+  - m_Rig: {fileID: 1200855810}
+    m_Active: 1
   m_Effectors: []
 --- !u!114 &6982812147933622152
 MonoBehaviour:
@@ -7466,7 +7610,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 6982812147933622150}
           m_TargetAssemblyTypeName: PlayerIK, Assembly-CSharp
-          m_MethodName: EnableHandIk
+          m_MethodName: OnLeanMiddle
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -7476,13 +7620,13 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-    EventName: Hold
+    EventType: 0
   - Event:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 6982812147933622150}
           m_TargetAssemblyTypeName: PlayerIK, Assembly-CSharp
-          m_MethodName: OnLeanDownAnimComplete
+          m_MethodName: OnLeanFloor
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -7492,13 +7636,13 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-    EventName: LeanDown
+    EventType: 1
   - Event:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 6982812147933622150}
           m_TargetAssemblyTypeName: PlayerIK, Assembly-CSharp
-          m_MethodName: OnLeanUpAnimMiddle
+          m_MethodName: OnLeanStand
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -7508,7 +7652,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-    EventName: LeanUp
+    EventType: 2
 --- !u!4 &6983258930626336602
 Transform:
   m_ObjectHideFlags: 0
@@ -8810,3 +8954,4 @@ SceneRoots:
   - {fileID: 7111604035074079385}
   - {fileID: 1184165070}
   - {fileID: 3893294199639930361}
+  - {fileID: 383823837}

@@ -5,39 +5,47 @@ using UnityEngine;
 public class PlayerAnimation : MonoBehaviour
 {
     private Animator animator;
-    private int leanDown_Hash;
-    private int leanUp_Hash;
+    private int pickUp_Hash;
     private ThirdPersonController controller;
 
     private void Awake() {
         animator = GetComponent<Animator>();
-        leanDown_Hash = Animator.StringToHash("LeanDown");
-        leanUp_Hash = Animator.StringToHash("LeanUp");
+        pickUp_Hash = Animator.StringToHash("LeanDown");
         controller = GetComponent<ThirdPersonController>();
     }
 
     void Start()
     {
         Interactor.Instance.OnHoldableInteracted += Interactor_Instance_OnHoldableInteracted;
-        GetComponent<PlayerIK>().OnObjectParentChanged += PlayerAnimation_OnObjectParentChanged;
+
+        InputManager.Instance.OnThrowKeyPerformed += InputManager_Instance_OnThrowKeyPerformed;
+        InputManager.Instance.OnDropItemKeyPerformed += InputManager_Instance_OnDropItemKeyPerformed;
     }
 
-    private void PlayerAnimation_OnObjectParentChanged(IHoldable holdable) {
-        animator.SetTrigger(leanUp_Hash);
-    }
 
     private void Interactor_Instance_OnHoldableInteracted(IHoldable holdable) {
 
-        Debug.Log(holdable.GetTransform().name);
+        //Debug.Log(holdable.GetTransform().name);
 
         if (PlayerIK.Instance.HasHoldingObject()) return;
 
         Transform standTargetTransform = holdable.GetTransform();
 
         SetTargetToMove(standTargetTransform, () => {
-            animator.SetTrigger(leanDown_Hash);
+            animator.SetTrigger(pickUp_Hash);
         });
 
+    }
+
+    private void InputManager_Instance_OnThrowKeyPerformed(object sender, EventArgs e) {
+        //Add Throw Anim And Use Anmation Event To throw 
+        //here Im ByPassing throw Anim.
+        PlayerIK.Instance.Throw();
+    }
+
+    private void InputManager_Instance_OnDropItemKeyPerformed(object sender, EventArgs e) {
+        if(PlayerIK.Instance.HasHoldingObject())
+        animator.SetTrigger(pickUp_Hash);
     }
 
     private void SetTargetToMove(Transform standTargetTransform, Action OnTargetReached) {

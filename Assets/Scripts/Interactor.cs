@@ -14,10 +14,12 @@ public class Interactor : MonoBehaviour {
         Instance = this;
     }
 
-    private void Update() {
-        if (Input.GetKeyDown(KeyCode.E)) {
-            Interact();
-        }
+    private void Start() {
+        InputManager.Instance.OnInteractionKeyPerformed += InputManager_Instance_OnInteractionKeyPerformed;
+    }
+
+    private void InputManager_Instance_OnInteractionKeyPerformed(object sender, EventArgs e) {
+        Interact();
     }
 
     private void Interact() {

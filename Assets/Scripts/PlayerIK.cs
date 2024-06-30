@@ -1,14 +1,17 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 public class PlayerIK : MonoBehaviour {
-    public static PlayerIK Instance {  get; private set; } 
+    public static PlayerIK Instance { get; private set; }
 
-    public event Action<IHoldable> OnObjectParentChanged;
-    public event Action<IHoldable> OnPlayerStabled;
+    public event Action<IHoldable> OntemPicked;
+    public event Action<IHoldable> OnPlayerPlaceDownKeyPerformed;
 
-    [SerializeField] private Rig holdingIkRig;
+    [SerializeField] private Rig handPositionRotationRig;
+    [SerializeField] private Rig rightLegPositionRig;
+    [SerializeField] private Rig headAimRig;
 
     private float targetWeight = 0f;
 
@@ -20,45 +23,46 @@ public class PlayerIK : MonoBehaviour {
 
     [SerializeField] private MultiAimConstraint headAimConstraint;
 
-
     [SerializeField] private Transform objectHoldTransform;
 
     private IHoldable holdable = null;
-    private Collider holdableColliderType;
 
+    private bool isHolding = false;
     private bool canPullHoldable = false;
-    private bool isStableEventInvoked = false;
+    private bool isPickedItemStabled = false;
 
     [SerializeField] private float lerpSpeed = 5f; // Speed of the lerp transition
 
     private void Awake() {
         Instance = this;
     }
+
     private void Start() {
+
         Interactor.Instance.OnHoldableInteracted += Interactor_Instance_OnHoldableInteracted;
+
+        SetActiveIks(new List<Rig> { handPositionRotationRig, rightLegPositionRig, headAimRig }, false);
     }
 
     private void Interactor_Instance_OnHoldableInteracted(IHoldable holdable) {
         if (this.holdable == null) {
-
+            // Grabbing Data Holdable That Player interacted
             this.holdable = holdable;
-            holdableColliderType = holdable.GetCollider();
+            // To Avoid Accidental Kicks 
             holdable.SetKinematic(true);
-
         }
-      
     }
 
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.G)) {
-            ThrowObject();
-            DisableHandIk();
-        }
+     
+        // Update Hands IK weights smoothly
+        handPositionRotationRig.weight = Mathf.Lerp(handPositionRotationRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
 
-        // Update IK weights smoothly
-        float currentWeight = holdingIkRig.weight;
-        float newWeight = Mathf.Lerp(currentWeight, targetWeight, Time.deltaTime * lerpSpeed);
-        holdingIkRig.weight = newWeight;
+        // Update Leg IK weights smoothly
+        rightLegPositionRig.weight = Mathf.Lerp(rightLegPositionRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
+
+        // Update Head IK weights smoothly
+        headAimRig.weight = Mathf.Lerp(headAimRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
 
         // Update IK targets positions if holdable is not null
         if (holdable != null && targetWeight > 0f) {
@@ -66,8 +70,8 @@ public class PlayerIK : MonoBehaviour {
             leftBoneIKConstraint.data.target.position = Vector3.Lerp(leftBoneIKConstraint.data.target.position, holdable.GetLeftHandIkTargetPosition(), Time.deltaTime * lerpSpeed);
             rightBoneIKConstraint.data.target.position = Vector3.Lerp(rightBoneIKConstraint.data.target.position, holdable.GetRightHandIkTargetPosition(), Time.deltaTime * lerpSpeed);
 
-            //To update target Aim Source Position
-            leftHandAimConstraint.data.sourceObjects[0].transform.position = Vector3.Lerp(leftHandAimConstraint.data.sourceObjects[0].transform.position, holdable.GetTransform().position,Time.deltaTime * lerpSpeed);
+            // To update target Aim Source Position
+            leftHandAimConstraint.data.sourceObjects[0].transform.position = Vector3.Lerp(leftHandAimConstraint.data.sourceObjects[0].transform.position, holdable.GetTransform().position, Time.deltaTime * lerpSpeed);
             rightHandAimConstraint.data.sourceObjects[0].transform.position = Vector3.Lerp(rightHandAimConstraint.data.sourceObjects[0].transform.position, holdable.GetTransform().position, Time.deltaTime * lerpSpeed);
         }
 
@@ -76,54 +80,82 @@ public class PlayerIK : MonoBehaviour {
             Transform childTransform = objectHoldTransform.GetChild(0);
             childTransform.localPosition = Vector3.Lerp(childTransform.localPosition, Vector3.zero, Time.deltaTime * lerpSpeed / 2);
 
-            if(childTransform.localPosition ==  Vector3.zero && !isStableEventInvoked) {
-                Debug.Log("raise event Here OnPlayer get Stabled");
-                OnPlayerStabled?.Invoke(holdable);
-                isStableEventInvoked = true;
+            if (childTransform.localPosition == Vector3.zero) {
+                //Debug.Log("Item Stabled");
+                isPickedItemStabled = true;
             }
 
-            if(holdableColliderType is CapsuleCollider /* || holdableColliderType is MeshCollider*/) {
+            if (holdable.GetCollider() is CapsuleCollider /* || holdableColliderType is MeshCollider */) {
                 childTransform.localRotation = Quaternion.Lerp(childTransform.localRotation, Quaternion.identity, Time.deltaTime * lerpSpeed / 2);
             }
         }
     }
 
-    private void ThrowObject() {
-        holdable?.Throw(objectHoldTransform);
-        SetHoldableNull();
-        isStableEventInvoked = false;
+    public void OnLeanMiddle() { //Animation Event
+        ToggleWeight();
     }
 
-    private void SetHoldableNull() {
-        holdable = null;
-        holdableColliderType = null;
-        OnObjectParentChanged?.Invoke(null);
+    private void ToggleWeight() {
+        isHolding = !isHolding;
+
+        targetWeight = isHolding ? 1 : 0;
     }
 
-    public void EnableHandIk() {
-        if (holdable != null) {
-            targetWeight = 1f;
-        }
-    }
+    public void OnLeanFloor() { //Animation Event
 
-    public void DisableHandIk() {
-        targetWeight = 0f;
-    }
+        if (isHolding && holdable != null) {
 
-    public void OnLeanDownAnimComplete() {
-        if (holdable != null) {
+            Debug.Log("Picking Up Saved Data Item");
+
             holdable.SetParent(objectHoldTransform, false);
+
             holdable.GetTransform().GetComponent<Collider>().isTrigger = true;
-            OnObjectParentChanged?.Invoke(holdable);
+
+            OntemPicked?.Invoke(holdable); // It Invokes Lean Up Anim
+
+            canPullHoldable = true;
         }
+        else if (!isHolding && holdable != null) {
+
+            Debug.Log("Dropping Down Item");
+
+            holdable.SetParent(null, false);
+
+            holdable.GetTransform().GetComponent<Collider>().isTrigger = false;
+
+            holdable.SetKinematic(false);
+
+            OntemPicked?.Invoke(null);
+
+            holdable = null;
+        }
+
     }
 
-    public void OnLeanUpAnimMiddle() {
-        Debug.Log("On Lean Up Middle");
-        canPullHoldable = true;
+    public void OnLeanStand() { //Animation Event
+
     }
 
-    public bool HasHoldingObject() {
-        return holdable != null;
+
+
+    private void SetActiveIks(List<Rig> rigs, bool active) {
+        foreach (Rig rig in rigs)
+            rig.weight = active ? 1f : 0f;
+    }
+
+    public bool HasHoldingObject() => holdable != null;
+
+    public bool IsHoldItemStabled() => HasHoldingObject() && isPickedItemStabled;
+
+    public IHoldable GetHoldItem() => holdable;
+
+    public void Throw() {
+        if ((holdable != null))
+        {
+            holdable?.Throw(objectHoldTransform);
+            holdable = null;
+            isPickedItemStabled = false;
+            ToggleWeight();
+        }
     }
 }

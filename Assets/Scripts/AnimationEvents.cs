@@ -7,8 +7,8 @@ using UnityEngine.Events;
 public class AnimationEvents : MonoBehaviour {
     public List<EventData> eventDatas;
 
-    public void TriggerAnimationEvent(string eventName) {
-        EventData eventData = eventDatas.Where(_event => (_event.EventName == eventName)).FirstOrDefault();
+    public void TriggerAnimationEvent(EventType eventType) {
+        EventData eventData = eventDatas.Where(_event => (_event.EventType == eventType)).FirstOrDefault();
         eventData.Event?.Invoke();
     }
 
@@ -16,6 +16,12 @@ public class AnimationEvents : MonoBehaviour {
     [System.Serializable]
     public class EventData {
         public UnityEvent Event;
-        public string EventName;
+        public EventType EventType;
+    }
+
+    public enum EventType {
+        LeanOnMiddle,
+        LeanOnFloor,
+        LeanUpStand
     }
 }

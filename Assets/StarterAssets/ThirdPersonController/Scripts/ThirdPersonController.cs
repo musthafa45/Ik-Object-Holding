@@ -131,6 +131,9 @@ namespace StarterAssets
         [SerializeField] private float targetRotationLerpSpeed = 2f;
         [SerializeField] private float agentStoppingDistance = 0.4f;
 
+        private float agentMoveGlitchTimer = 0;
+        private float agentMoveGlitchTimeMax = 3f;
+
         private void Awake()
         {
             // get a reference to our main camera
@@ -180,6 +183,8 @@ namespace StarterAssets
             _targetTransform = targetTransform;
             _onTargetReached = onTargetReached;
             _moveToTarget = true;
+
+            agentMoveGlitchTimer = agentMoveGlitchTimeMax;
         }
 
         private void MoveToTarget() {
@@ -198,7 +203,9 @@ namespace StarterAssets
 
             _animator.SetFloat(_animIDSpeed, MoveSpeed);
 
-            if (Vector3.Distance(transform.position, _targetTransform.position) < agentStoppingDistance) {
+            agentMoveGlitchTimer -= Time.deltaTime;
+
+            if (Vector3.Distance(transform.position, _targetTransform.position) < agentStoppingDistance || agentMoveGlitchTimer < 0) {
                 _moveToTarget = false;
                 _onTargetReached?.Invoke();
             }

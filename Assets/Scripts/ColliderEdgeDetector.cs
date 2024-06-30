@@ -19,10 +19,12 @@ public class ColliderEdgeDetector : MonoBehaviour {
     [SerializeField] private Vector3 leftHoldPointOffset;
     [SerializeField] private Vector3 rightHoldPointOffset;
 
+    private IHoldable holdable = null;
     private Collider baseCollider;
     private bool canDoFixedHoldPoint = false;
     private void Awake() {
         baseCollider = GetCollider();
+        holdable = GetComponent<IHoldable>();
 
         leftHoldPointTransform = new GameObject("left_Point").transform;
         rightHoldPointTransform = new GameObject("right_point").transform;
@@ -31,8 +33,7 @@ public class ColliderEdgeDetector : MonoBehaviour {
     }
 
     private void Start() {
-        PlayerIK.Instance.OnObjectParentChanged += PlayerIk_Instance_OnObjectParentChanged;
-        PlayerIK.Instance.OnPlayerStabled += PlayerIk_Instance_OnPlayerStabled;
+        PlayerIK.Instance.OntemPicked += PlayerIk_Instance_OnObjectParentChanged;
     }
 
     private void PlayerIk_Instance_OnObjectParentChanged(IHoldable holdable) {
@@ -53,6 +54,10 @@ public class ColliderEdgeDetector : MonoBehaviour {
         Gizmos.color = gizmoColor;
         Gizmos.DrawSphere(leftHoldPointTransform.position, 0.07f);
         Gizmos.DrawSphere(rightHoldPointTransform.position, 0.07f);
+    }
+
+    private void Update() {
+        canDoFixedHoldPoint = PlayerIK.Instance.IsHoldItemStabled() && PlayerIK.Instance.GetHoldItem() == holdable;
     }
 
     private void FixedUpdate() {
