@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -38,31 +39,26 @@ public class PlayerIK : MonoBehaviour {
     }
 
     private void Start() {
-
         Interactor.Instance.OnHoldableInteracted += Interactor_Instance_OnHoldableInteracted;
-
         SetActiveIks(new List<Rig> { handPositionRotationRig, rightLegPositionRig, headAimRig }, false);
     }
 
     private void Interactor_Instance_OnHoldableInteracted(IHoldable holdable) {
         if (this.holdable == null) {
-            // Grabbing Data Holdable That Player interacted
             this.holdable = holdable;
-            // To Avoid Accidental Kicks 
             holdable.SetKinematic(true);
         }
     }
 
     private void Update() {
-     
         // Update Hands IK weights smoothly
         handPositionRotationRig.weight = Mathf.Lerp(handPositionRotationRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
 
-        // Update Leg IK weights smoothly
-        rightLegPositionRig.weight = Mathf.Lerp(rightLegPositionRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
-
         // Update Head IK weights smoothly
         headAimRig.weight = Mathf.Lerp(headAimRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
+
+        // Update Leg IK weights smoothly
+        rightLegPositionRig.weight = Mathf.Lerp(rightLegPositionRig.weight, 0, Time.deltaTime * lerpSpeed / 2);
 
         // Update IK targets positions if holdable is not null
         if (holdable != null && targetWeight > 0f) {
@@ -91,45 +87,40 @@ public class PlayerIK : MonoBehaviour {
         }
     }
 
-
     private void ToggleWeight() {
         isHolding = !isHolding;
-
-        targetWeight = isHolding ? 1 : 0;
+        StopAllCoroutines();
+        StartCoroutine(LerpWeight(isHolding ? 1 : 0));
     }
+
+    private IEnumerator LerpWeight(float target) {
+        while (Mathf.Abs(targetWeight - target) > 0.01f) {
+            targetWeight = Mathf.Lerp(targetWeight, target, Time.deltaTime * lerpSpeed);
+            yield return null;
+        }
+        targetWeight = target;
+    }
+
     public void OnLeanMiddle() { //Animation Event
         ToggleWeight();
     }
 
     public void OnLeanFloor() { //Animation Event
-
         if (isHolding && holdable != null) {
-
             Debug.Log("Picking Up Saved Data Item");
-
             holdable.SetParent(objectHoldTransform, false);
-
             holdable.GetTransform().GetComponent<Collider>().isTrigger = true;
-
             OntemPicked?.Invoke(holdable); // It Invokes Lean Up Anim
-
             canPullHoldable = true;
         }
         else if (!isHolding && holdable != null) {
-
             Debug.Log("Dropping Down Item");
-
             holdable.SetParent(null, false);
-
             holdable.GetTransform().GetComponent<Collider>().isTrigger = false;
-
             holdable.SetKinematic(false);
-
             OntemPicked?.Invoke(null);
-
             holdable = null;
         }
-
     }
 
     private void SetActiveIks(List<Rig> rigs, bool active) {
@@ -144,8 +135,7 @@ public class PlayerIK : MonoBehaviour {
     public IHoldable GetHoldItem() => holdable;
 
     public void Throw() {
-        if ((holdable != null))
-        {
+        if (holdable != null) {
             holdable?.Throw(objectHoldTransform);
             holdable = null;
             isPickedItemStabled = false;
