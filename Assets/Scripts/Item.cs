@@ -4,32 +4,26 @@ public class Item : MonoBehaviour, IHoldable {
 
     private ColliderEdgeDetector edgeDetector;
     private Rigidbody rb;
+    private Collider collider;
+
     [SerializeField] private float throwForce = 2f;
 
     private void Awake() {
         edgeDetector = GetComponent<ColliderEdgeDetector>();
+        collider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
     }
 
-    public Vector3 GetLeftHandIkTargetPosition() => edgeDetector.GetLeftHoldPoint();
+    public Transform GetLeftHandIkTargetTransform() => edgeDetector.GetLeftHoldPoint();
 
-    public Vector3 GetRightHandIkTargetPosition() => edgeDetector.GetRightHoldPoint();
+    public Transform GetRightHandIkTargetTransform() => edgeDetector.GetRightHoldPoint();
 
     public Transform GetTransform() => transform;
 
     public void SetKinematic(bool active) => rb.isKinematic = active;
 
-    public void SetParent(Transform target,bool resetLocalPos = true) {
-        if(target != null) {
-            transform.SetParent(target);
-            if(resetLocalPos ) {
-                transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            }
-        }
-        else {
-            transform.SetParent(null);
-        }
-      
+    public void SetParent(Transform target) {
+        transform.SetParent(target);
     }
 
     public void Throw(Transform objectHoldTransform) {
@@ -40,10 +34,5 @@ public class Item : MonoBehaviour, IHoldable {
         rb.AddForce(dir * throwForce,ForceMode.Impulse);
     }
 
-    public Collider GetCollider() {
-        if (TryGetComponent(out Collider collider))
-            return collider;
-        else 
-            return null;
-    } 
+    public Collider GetCollider() => collider; 
 }

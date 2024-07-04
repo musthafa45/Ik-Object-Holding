@@ -54976,15 +54976,15 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.38333333
-    functionName: TriggerAnimationEvent
-    data: LeanDownMiddle
+    functionName: OnLeanMiddleComplete
+    data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.65
-    functionName: TriggerAnimationEvent
-    data: LeanDownEnd
+    functionName: OnLeanFloorComplete
+    data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1

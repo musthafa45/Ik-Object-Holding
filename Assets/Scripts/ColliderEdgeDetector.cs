@@ -12,11 +12,11 @@ public class ColliderEdgeDetector : MonoBehaviour {
     public LayerMask layerMask;  // LayerMask to filter which layers to consider
     public Vector3 rayOffset = Vector3.zero; // Offset of Ray Origin
 
-    [Space]
-    private Vector3 leftHoldPoint;
-    private Vector3 rightHoldPoint;
+    private Transform leftHoldPointTransform;
+    private Transform rightHoldPointTransform;
 
     [Space]
+
     [SerializeField] private Vector3 leftHoldPointOffset;
     [SerializeField] private Vector3 rightHoldPointOffset;
 
@@ -25,16 +25,23 @@ public class ColliderEdgeDetector : MonoBehaviour {
     [SerializeField] private bool drawGuiGrabPoints = true;
 
     private void Awake() {
+
         baseCollider = GetAttachedCollider();
+
+        leftHoldPointTransform = new GameObject("left_Point").transform;
+        rightHoldPointTransform = new GameObject("right_point").transform;
+        leftHoldPointTransform.parent = transform;
+        rightHoldPointTransform.parent = transform;
     }
 
     private void OnDrawGizmos() {
-        if (leftHoldPoint != Vector3.zero && rightHoldPoint != Vector3.zero) {
+        if (leftHoldPointTransform != null && rightHoldPointTransform != null) {
             Gizmos.color = gizmoColor;
-            Gizmos.DrawSphere(leftHoldPoint, 0.07f);
-            Gizmos.DrawSphere(rightHoldPoint, 0.07f);
+            Gizmos.DrawSphere(leftHoldPointTransform.position, 0.07f);
+            Gizmos.DrawSphere(rightHoldPointTransform.position, 0.07f);
         }
     }
+
 
     private void FixedUpdate() {
         if (baseCollider != null && playerTransform != null) {
@@ -51,28 +58,29 @@ public class ColliderEdgeDetector : MonoBehaviour {
         Vector3 leftDirection = -rightDirection;
 
         // Right grip point
-        RaycastForHoldPoint(objectCenter, rightDirection, ref leftHoldPoint, leftHoldPointOffset);
+        RaycastForHoldPoint(objectCenter, rightDirection, ref leftHoldPointTransform, leftHoldPointOffset);
 
         // Left grip point
-        RaycastForHoldPoint(objectCenter, leftDirection, ref rightHoldPoint, rightHoldPointOffset);
+        RaycastForHoldPoint(objectCenter, leftDirection, ref rightHoldPointTransform, rightHoldPointOffset);
     }
 
-    private void RaycastForHoldPoint(Vector3 objectCenter, Vector3 direction, ref Vector3 holdPoint, Vector3 holdPointOffset) {
+    private void RaycastForHoldPoint(Vector3 objectCenter, Vector3 direction, ref Transform holdPointTransform, Vector3 holdPointOffset) {
         Vector3 rayOrigin = objectCenter + direction + rayOffset * rayLength;
         if (Physics.Raycast(rayOrigin, -direction, out RaycastHit hit, rayLength, layerMask)) {
             if (hit.collider == baseCollider) {
-                holdPoint = hit.point + holdPointOffset;
+                holdPointTransform.position = hit.point + holdPointOffset;
                 if (showRayCast) Debug.DrawRay(rayOrigin, -direction * rayLength, rayCastColor);
             } else {
-                holdPoint = objectCenter + direction + holdPointOffset * rayLength;
+                holdPointTransform.position = objectCenter + direction + holdPointOffset * rayLength;
             }
         } else {
-            holdPoint = objectCenter + direction + holdPointOffset * rayLength;
+            holdPointTransform.position = objectCenter + direction + holdPointOffset * rayLength;
         }
     }
 
-    public Vector3 GetLeftHoldPoint() => leftHoldPoint;
-    public Vector3 GetRightHoldPoint() => rightHoldPoint;
+    public Transform GetLeftHoldPoint() => leftHoldPointTransform;
+
+    public Transform GetRightHoldPoint() => rightHoldPointTransform;
 
     private Collider GetAttachedCollider() {
         if (TryGetComponent(out Collider collider)) {
@@ -89,7 +97,8 @@ public class ColliderEdgeDetector : MonoBehaviour {
     }
 
     private void OnGUI() {
-        if ((leftHoldPoint == Vector3.zero || rightHoldPoint == Vector3.zero) && !drawGuiGrabPoints) return;
+
+        if (leftHoldPointTransform == null || rightHoldPointTransform == null && !drawGuiGrabPoints) return;
 
         // Create a style for the label
         GUIStyle style = new GUIStyle {
@@ -98,8 +107,8 @@ public class ColliderEdgeDetector : MonoBehaviour {
         };
 
         // Convert world positions to screen positions
-        Vector3 leftScreenPoint = Camera.main.WorldToScreenPoint(leftHoldPoint);
-        Vector3 rightScreenPoint = Camera.main.WorldToScreenPoint(rightHoldPoint);
+        Vector3 leftScreenPoint = Camera.main.WorldToScreenPoint(leftHoldPointTransform.position);
+        Vector3 rightScreenPoint = Camera.main.WorldToScreenPoint(rightHoldPointTransform.position);
 
         // Draw labels at screen positions
         GUI.Label(new Rect(leftScreenPoint.x, Screen.height - leftScreenPoint.y, 100, 20), "Left", style);

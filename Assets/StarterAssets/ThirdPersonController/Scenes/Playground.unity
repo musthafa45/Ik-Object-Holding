@@ -5909,7 +5909,7 @@ GameObject:
   - component: {fileID: 6982812147933622148}
   - component: {fileID: 6982812147933622150}
   - component: {fileID: 6982812147933622151}
-  - component: {fileID: 6982812147933622152}
+  - component: {fileID: 6982812147933622153}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -7649,7 +7649,6 @@ MonoBehaviour:
   leftHandAimConstraint: {fileID: 983013144}
   rightHandAimConstraint: {fileID: 959025101}
   headAimConstraint: {fileID: 1853100438}
-  objectHoldTransform: {fileID: 1976413516}
   lerpSpeed: 30
 --- !u!114 &6982812147933622151
 MonoBehaviour:
@@ -7671,7 +7670,7 @@ MonoBehaviour:
   - m_Rig: {fileID: 1200855810}
     m_Active: 1
   m_Effectors: []
---- !u!114 &6982812147933622152
+--- !u!114 &6982812147933622153
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7680,42 +7679,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4416926083347132227}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a0029f8f911a314ebe2e04be65ce6c7, type: 3}
+  m_Script: {fileID: 11500000, guid: 20973a486304b434d942352676ce91a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eventDatas:
-  - Event:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 6982812147933622150}
-          m_TargetAssemblyTypeName: PlayerIK, Assembly-CSharp
-          m_MethodName: OnLeanMiddle
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    EventType: 0
-  - Event:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 6982812147933622150}
-          m_TargetAssemblyTypeName: PlayerIK, Assembly-CSharp
-          m_MethodName: OnLeanFloor
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    EventType: 1
+  objectHoldTransform: {fileID: 1976413516}
+  lerpSpeed: 30
 --- !u!4 &6983258930626336602
 Transform:
   m_ObjectHideFlags: 0

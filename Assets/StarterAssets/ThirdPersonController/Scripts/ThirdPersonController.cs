@@ -107,7 +107,6 @@ namespace StarterAssets
         private CharacterController _controller;
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
-        private PlayerIK playerIK;
 
         private const float _threshold = 0.01f;
         private bool _hasAnimator;
@@ -151,7 +150,6 @@ namespace StarterAssets
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
-            playerIK = GetComponent<PlayerIK>();
 #if ENABLE_INPUT_SYSTEM 
             _playerInput = GetComponent<PlayerInput>();
 #else
@@ -264,7 +262,7 @@ namespace StarterAssets
         private void Move()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
-            float targetSpeed = _input.sprint && !playerIK.HasHoldingObject() ? SprintSpeed : MoveSpeed;
+            float targetSpeed = _input.sprint && !PlayerItemHolder.Instance.HasHoldingObject() ? SprintSpeed : MoveSpeed;
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
@@ -351,7 +349,7 @@ namespace StarterAssets
                 }
 
                 // Jump
-                if (_input.jump && _jumpTimeoutDelta <= 0.0f && !playerIK.HasHoldingObject())
+                if (_input.jump && _jumpTimeoutDelta <= 0.0f && !PlayerItemHolder.Instance.HasHoldingObject())
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);

@@ -2,14 +2,14 @@ using UnityEngine;
 
 public interface IHoldable
 {
-    Vector3 GetLeftHandIkTargetPosition();
+    Transform GetLeftHandIkTargetTransform();
 
-    Vector3 GetRightHandIkTargetPosition();
+    Transform GetRightHandIkTargetTransform();
 
     Transform GetTransform();
 
     Collider GetCollider();
     void SetKinematic(bool active);
-    void SetParent(Transform target, bool resetLocalPos = true);
+    void SetParent(Transform target);
     void Throw(Transform objectHoldTransform);
 }

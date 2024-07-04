@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -11,8 +8,6 @@ public class PlayerIK : MonoBehaviour {
     [SerializeField] private Rig rightLegPositionRig;
     [SerializeField] private Rig headAimRig;
 
-    private float targetWeight = 0f;
-
     [SerializeField] private TwoBoneIKConstraint leftBoneIKConstraint;
     [SerializeField] private TwoBoneIKConstraint rightBoneIKConstraint;
 
@@ -21,117 +16,101 @@ public class PlayerIK : MonoBehaviour {
 
     [SerializeField] private MultiAimConstraint headAimConstraint;
 
-    [SerializeField] private Transform objectHoldTransform;
-
-    private IHoldable holdable = null;
-
-    private bool isHolding = false;
-    private bool canPullHoldable = false;
-
     [SerializeField] private float lerpSpeed = 5f; // Speed of the lerp transition
+
+
+    private Transform leftHandTargetFollowTransform = null;
+    private Transform rightHandTargetFollowTransform = null;
+
+    private Transform rightLegTargetFollowTransform = null;
+
+    private Transform headAimTargetFollowTransform = null;
 
     private void Awake() {
         Instance = this;
     }
 
     private void Start() {
-        Interactor.Instance.OnHoldableInteracted += Interactor_Instance_OnHoldableInteracted;
-        SetActiveIks(new List<Rig> { handPositionRotationRig, rightLegPositionRig, headAimRig }, false);
+
+        PlayerItemHolder.Instance.OnObjectThrown += PlayerItemHolder_Instance_OnObjectThrown;
+        PlayerItemHolder.Instance.OnHoldableDropped += PlayerItemHolder_Instance_OnHoldableDropped;
+
+        handPositionRotationRig.weight = 0f;
+        rightLegPositionRig.weight = 0f;
+        headAimRig.weight = 0f;  
     }
 
-    private void Interactor_Instance_OnHoldableInteracted(IHoldable holdable) {
-        if (this.holdable == null) {
-            this.holdable = holdable;
-            holdable.SetKinematic(true);
-        }
+    private void PlayerItemHolder_Instance_OnHoldableDropped() {
+        SetAllTargetConstrainsNull();
+    }
+
+    private void PlayerItemHolder_Instance_OnObjectThrown() {
+        SetAllTargetConstrainsNull();
+    }
+
+    private void SetAllTargetConstrainsNull() {
+        leftHandTargetFollowTransform = null;
+        rightHandTargetFollowTransform = null;
+        rightLegTargetFollowTransform = null;
+        headAimTargetFollowTransform = null;
     }
 
     private void Update() {
-        // Update Hands IK weights smoothly
-        handPositionRotationRig.weight = Mathf.Lerp(handPositionRotationRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
-
-        // Update Head IK weights smoothly
-        headAimRig.weight = Mathf.Lerp(headAimRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
-
-        // Update Leg IK weights smoothly
-        rightLegPositionRig.weight = Mathf.Lerp(rightLegPositionRig.weight, targetWeight, Time.deltaTime * lerpSpeed / 2);
-
-
-        // Update IK targets positions if holdable is not null
-        if (holdable != null && targetWeight > 0f) {
-            // Update positions with Lerp
-            leftBoneIKConstraint.data.target.position = Vector3.Lerp(leftBoneIKConstraint.data.target.position, holdable.GetLeftHandIkTargetPosition(), Time.deltaTime * lerpSpeed);
-            rightBoneIKConstraint.data.target.position = Vector3.Lerp(rightBoneIKConstraint.data.target.position, holdable.GetRightHandIkTargetPosition(), Time.deltaTime * lerpSpeed);
-
-            // To update target Aim Source Position
-            leftHandAimConstraint.data.sourceObjects[0].transform.position = Vector3.Lerp(leftHandAimConstraint.data.sourceObjects[0].transform.position, holdable.GetTransform().position, Time.deltaTime * lerpSpeed);
-            rightHandAimConstraint.data.sourceObjects[0].transform.position = Vector3.Lerp(rightHandAimConstraint.data.sourceObjects[0].transform.position, holdable.GetTransform().position, Time.deltaTime * lerpSpeed);
-        }
-
-        // Lerp the child object to the reset position if CanPullHoldable is true
-        if (canPullHoldable && holdable != null && objectHoldTransform.childCount > 0) {
-            Transform childTransform = objectHoldTransform.GetChild(0);
-            childTransform.localPosition = Vector3.Lerp(childTransform.localPosition, Vector3.zero, Time.deltaTime * lerpSpeed / 2);
-
-            if (holdable.GetCollider() is CapsuleCollider /* || holdableColliderType is MeshCollider */) {
-                childTransform.localRotation = Quaternion.Lerp(childTransform.localRotation, Quaternion.identity, Time.deltaTime * lerpSpeed / 2);
-            }
-        }
+       HandleIk();
     }
 
-    private void ToggleWeight() {
-        isHolding = !isHolding;
-        StopAllCoroutines();
-        StartCoroutine(LerpWeight(isHolding ? 1 : 0));
-    }
+    private void HandleIk() {
 
-    private IEnumerator LerpWeight(float target) {
-        while (Mathf.Abs(targetWeight - target) > 0.01f) {
-            targetWeight = Mathf.Lerp(targetWeight, target, Time.deltaTime * lerpSpeed);
-            yield return null;
+        if (leftHandTargetFollowTransform != null && rightHandTargetFollowTransform != null) {
+            // Update Hands IK weights smoothly to 1
+            handPositionRotationRig.weight = Mathf.Lerp(handPositionRotationRig.weight, 1f, Time.deltaTime * lerpSpeed / 2);
+
+            // Updating Ik Data Object Positions
+            leftBoneIKConstraint.data.target.position = Vector3.Lerp(leftBoneIKConstraint.data.target.position, leftHandTargetFollowTransform.position, Time.deltaTime * lerpSpeed);
+            rightBoneIKConstraint.data.target.position = Vector3.Lerp(rightBoneIKConstraint.data.target.position, rightHandTargetFollowTransform.position, Time.deltaTime * lerpSpeed);
+
+            // To update Hand target Aim Source Position
+            leftHandAimConstraint.data.sourceObjects[0].transform.position = Vector3.Lerp(leftHandAimConstraint.data.sourceObjects[0].transform.position, rightHandTargetFollowTransform.position, Time.deltaTime * lerpSpeed);
+            rightHandAimConstraint.data.sourceObjects[0].transform.position = Vector3.Lerp(rightHandAimConstraint.data.sourceObjects[0].transform.position, leftHandTargetFollowTransform.position, Time.deltaTime * lerpSpeed);
         }
-        targetWeight = target;
-    }
-
-    public void OnLeanMiddle() { //Animation Event
-        ToggleWeight();
-    }
-
-    public void OnLeanFloor() { //Animation Event
-        if (isHolding && holdable != null) {
-            Debug.Log("Picking Up  Item");
-
-            holdable.SetParent(objectHoldTransform, false);
-
-            holdable.GetTransform().GetComponent<Collider>().isTrigger = true;
-
-            canPullHoldable = true;
+        else {
+            // Update Hands IK weights smoothly to 0
+            handPositionRotationRig.weight = Mathf.Lerp(handPositionRotationRig.weight, 0f, Time.deltaTime * lerpSpeed / 2);
         }
-        else if (!isHolding && holdable != null) {
-            Debug.Log("Dropping Down Item");
 
-            holdable.SetParent(null, false);
 
-            holdable.GetTransform().GetComponent<Collider>().isTrigger = false;
+        if (headAimTargetFollowTransform != null) {
+            // Update Head IK weights smoothly to 1
+            headAimRig.weight = Mathf.Lerp(headAimRig.weight, 1f, Time.deltaTime * lerpSpeed / 2);
+        }
+        else {
+            // Update Head IK weights smoothly to 0
+            headAimRig.weight = Mathf.Lerp(headAimRig.weight, 0f, Time.deltaTime * lerpSpeed / 2);
+        }
 
-            holdable.SetKinematic(false);
-
-            holdable = null;
+        if (rightLegTargetFollowTransform != null) {
+            // Update Leg IK weights smoothly to 1
+            rightLegPositionRig.weight = Mathf.Lerp(rightLegPositionRig.weight, 1f, Time.deltaTime * lerpSpeed / 2);
+        }
+        else {
+            // Update Leg IK weights smoothly to 0
+            rightLegPositionRig.weight = Mathf.Lerp(rightLegPositionRig.weight, 0f, Time.deltaTime * lerpSpeed / 2);
         }
     }
 
-    private void SetActiveIks(List<Rig> rigs, bool active) {
-        foreach (Rig rig in rigs)
-            rig.weight = active ? 1f : 0f;
+    public void SetLeftHandFollowTarget(Transform leftHandTarget) {
+        leftHandTargetFollowTransform = leftHandTarget;
     }
 
-    public bool HasHoldingObject() => holdable != null;
+    public void SetRightHandFollowTarget(Transform rightHandTarget) {
+       rightHandTargetFollowTransform = rightHandTarget;
+    }
 
-    public void Throw() {
-        if (holdable != null) {
-            holdable?.Throw(objectHoldTransform);
-            holdable = null;
-            ToggleWeight();
-        }
+    public void SetRightLegFollowTarget(Transform rightLegTarget) {
+        rightLegTargetFollowTransform = rightLegTarget;
+    }
+
+    public void SetHeadAimTarget(Transform headAimTarget) {
+        headAimTargetFollowTransform = headAimTarget;
     }
 }
