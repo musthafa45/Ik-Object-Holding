@@ -34,14 +34,7 @@ public class ColliderEdgeDetector : MonoBehaviour {
         rightHoldPointTransform.parent = transform;
     }
 
-    private void OnDrawGizmos() {
-        if (leftHoldPointTransform != null && rightHoldPointTransform != null) {
-            Gizmos.color = gizmoColor;
-            Gizmos.DrawSphere(leftHoldPointTransform.position, 0.07f);
-            Gizmos.DrawSphere(rightHoldPointTransform.position, 0.07f);
-        }
-    }
-
+  
 
     private void FixedUpdate() {
         if (baseCollider != null && playerTransform != null) {
@@ -114,4 +107,13 @@ public class ColliderEdgeDetector : MonoBehaviour {
         GUI.Label(new Rect(leftScreenPoint.x, Screen.height - leftScreenPoint.y, 100, 20), "Left", style);
         GUI.Label(new Rect(rightScreenPoint.x, Screen.height - rightScreenPoint.y, 100, 20), "Right", style);
     }
+
+    private void OnDrawGizmos() {
+        if (leftHoldPointTransform != null && rightHoldPointTransform != null) {
+            Gizmos.color = gizmoColor;
+            Gizmos.DrawSphere(leftHoldPointTransform.position, 0.07f);
+            Gizmos.DrawSphere(rightHoldPointTransform.position, 0.07f);
+        }
+    }
+
 }

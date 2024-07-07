@@ -937,7 +937,7 @@ MonoBehaviour:
   rayOffset: {x: 0, y: 0, z: 0}
   leftHoldPointOffset: {x: 0, y: 0, z: 0}
   rightHoldPointOffset: {x: 0, y: 0, z: 0}
-  DRAW_GUI_GRABPOINTS: 1
+  drawGuiGrabPoints: 1
 --- !u!4 &522189066 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2382810566493446626, guid: 7b846d8f536f007498c941069487ce81, type: 3}
@@ -2395,7 +2395,7 @@ MonoBehaviour:
   rayOffset: {x: 0, y: 0, z: 0}
   leftHoldPointOffset: {x: 0.01, y: 0, z: 0}
   rightHoldPointOffset: {x: -0.03, y: 0, z: 0}
-  DRAW_GUI_GRABPOINTS: 1
+  drawGuiGrabPoints: 1
 --- !u!4 &1302665049 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8718778828885884488, guid: e5f4daf24146ee040b5a2d7a73b30aa0, type: 3}
@@ -2750,7 +2750,7 @@ MonoBehaviour:
   rayOffset: {x: 0, y: 0, z: 0}
   leftHoldPointOffset: {x: 0, y: 0, z: 0}
   rightHoldPointOffset: {x: 0, y: 0, z: 0}
-  DRAW_GUI_GRABPOINTS: 1
+  drawGuiGrabPoints: 1
 --- !u!1 &1573587792
 GameObject:
   m_ObjectHideFlags: 0
@@ -6742,7 +6742,7 @@ MonoBehaviour:
   rayOffset: {x: 0, y: 0, z: 0}
   leftHoldPointOffset: {x: 0, y: 0, z: 0}
   rightHoldPointOffset: {x: 0, y: 0, z: 0}
-  DRAW_GUI_GRABPOINTS: 1
+  drawGuiGrabPoints: 1
 --- !u!114 &5923292704607519849
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7108,7 +7108,7 @@ MonoBehaviour:
   rayOffset: {x: 0, y: 0, z: 0}
   leftHoldPointOffset: {x: 0, y: 0, z: 0}
   rightHoldPointOffset: {x: 0, y: 0, z: 0}
-  DRAW_GUI_GRABPOINTS: 1
+  drawGuiGrabPoints: 1
 --- !u!114 &6171922293681983300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7297,7 +7297,7 @@ MonoBehaviour:
   rayOffset: {x: 0, y: 0, z: 0}
   leftHoldPointOffset: {x: 0, y: 0, z: 0}
   rightHoldPointOffset: {x: 0, y: 0, z: 0}
-  DRAW_GUI_GRABPOINTS: 1
+  drawGuiGrabPoints: 1
 --- !u!114 &6472687152736633288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8598,7 +8598,7 @@ MonoBehaviour:
   rayOffset: {x: 0, y: 0, z: 0}
   leftHoldPointOffset: {x: 0, y: 0, z: 0}
   rightHoldPointOffset: {x: 0, y: 0, z: 0}
-  DRAW_GUI_GRABPOINTS: 1
+  drawGuiGrabPoints: 1
 --- !u!4 &8818194237034159815
 Transform:
   m_ObjectHideFlags: 0

@@ -22,9 +22,7 @@ public class Item : MonoBehaviour, IHoldable {
 
     public void SetKinematic(bool active) => rb.isKinematic = active;
 
-    public void SetParent(Transform target) {
-        transform.SetParent(target);
-    }
+    public void SetParent(Transform target) => transform.SetParent(target);
 
     public void Throw(Transform objectHoldTransform) {
         SetKinematic(false);

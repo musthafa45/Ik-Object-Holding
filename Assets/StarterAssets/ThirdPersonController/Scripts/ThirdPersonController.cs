@@ -131,7 +131,7 @@ namespace StarterAssets
         [SerializeField] private float agentStoppingDistance = 0.4f;
 
         private float agentMoveGlitchTimer = 0;
-        private const float agentMoveGlitchTimeMax = 2f;
+        private const float agentMoveGlitchTimeMax = 1.5f;
 
         private void Awake()
         {
