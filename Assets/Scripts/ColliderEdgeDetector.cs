@@ -26,7 +26,7 @@ public class ColliderEdgeDetector : MonoBehaviour {
 
     private void Awake() {
 
-        baseCollider = GetAttachedCollider();
+        baseCollider = GetComponent<Collider>();
 
         leftHoldPointTransform = new GameObject("left_Point").transform;
         rightHoldPointTransform = new GameObject("right_point").transform;
@@ -75,38 +75,6 @@ public class ColliderEdgeDetector : MonoBehaviour {
 
     public Transform GetRightHoldPoint() => rightHoldPointTransform;
 
-    private Collider GetAttachedCollider() {
-        if (TryGetComponent(out Collider collider)) {
-            return collider;
-        } else {
-            collider = GetComponentInParent<Collider>();
-            if (collider != null) {
-                return collider;
-            } else {
-                Debug.LogWarning("Object has no attached collider.");
-                return null;
-            }
-        }
-    }
-
-    private void OnGUI() {
-
-        if (leftHoldPointTransform == null || rightHoldPointTransform == null && !drawGuiGrabPoints) return;
-
-        // Create a style for the label
-        GUIStyle style = new GUIStyle {
-            fontSize = 10,
-            normal = { textColor = Color.green }
-        };
-
-        // Convert world positions to screen positions
-        Vector3 leftScreenPoint = Camera.main.WorldToScreenPoint(leftHoldPointTransform.position);
-        Vector3 rightScreenPoint = Camera.main.WorldToScreenPoint(rightHoldPointTransform.position);
-
-        // Draw labels at screen positions
-        GUI.Label(new Rect(leftScreenPoint.x, Screen.height - leftScreenPoint.y, 100, 20), "Left", style);
-        GUI.Label(new Rect(rightScreenPoint.x, Screen.height - rightScreenPoint.y, 100, 20), "Right", style);
-    }
 
     private void OnDrawGizmos() {
         if (leftHoldPointTransform != null && rightHoldPointTransform != null) {

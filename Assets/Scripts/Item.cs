@@ -4,13 +4,13 @@ public class Item : MonoBehaviour, IHoldable {
 
     private ColliderEdgeDetector edgeDetector;
     private Rigidbody rb;
-    private Collider collider;
+    private Collider itemCollider;
 
     [SerializeField] private float throwForce = 2f;
 
     private void Awake() {
         edgeDetector = GetComponent<ColliderEdgeDetector>();
-        collider = GetComponent<Collider>();
+        itemCollider = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
     }
 
@@ -32,5 +32,5 @@ public class Item : MonoBehaviour, IHoldable {
         rb.AddForce(dir * throwForce,ForceMode.Impulse);
     }
 
-    public Collider GetCollider() => collider; 
+    public Collider GetCollider() => itemCollider; 
 }

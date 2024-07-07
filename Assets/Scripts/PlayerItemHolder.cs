@@ -78,7 +78,7 @@ public class PlayerItemHolder : MonoBehaviour
             Transform childTransform = objectHoldTransform.GetChild(0);
             childTransform.localPosition = Vector3.Lerp(childTransform.localPosition, Vector3.zero, Time.deltaTime * lerpSpeed / 2);
 
-            if (holdable.GetCollider() is CapsuleCollider /* || holdableColliderType is MeshCollider */) {
+            if (holdable.GetCollider() is CapsuleCollider /* || holdableColliderType is MeshCollider */ || holdable.GetCollider() is BoxCollider) {
                 childTransform.localRotation = Quaternion.Lerp(childTransform.localRotation, Quaternion.identity, Time.deltaTime * lerpSpeed / 2);
             }
         }
